@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 
-from .serializers import MemberSerializer
 from .models import Member
+from .serializers import MemberSerializer
 
 
 class MemberViewSet(ModelViewSet):

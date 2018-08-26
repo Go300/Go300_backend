@@ -3,13 +3,18 @@ version: '3'
 services:
   go300_db:
     image: postgres
+    volumes:
+      - ./data:/var/lib/postgresql/data:rw
     ports:
       - 5432:5432
 
   go300:
     build: ./
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:80"
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./src:/src:rw
+      - ./.env:/src/core/.env
     ports:
-      - 80:80
+      - 8000:8000
     depends_on:
       - go300_db

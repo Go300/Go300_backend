@@ -2,12 +2,20 @@ version: '3'
 
 services:
   go300_db:
-    image: postgres
+    image: postgres:alpine
     volumes:
       - ./data:/var/lib/postgresql/data:rw
     ports:
       - 5432:5432
 
+  go300_db_admin:
+    image: fenglc/pgadmin4
+    volumes:
+       - /data/pgadmin:/root/.pgadmin
+    ports:
+      - "5050:5050"
+    depends_on:
+      - go300_db
   go300:
     build: ./
     command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
@@ -18,3 +26,21 @@ services:
       - 8000:8000
     depends_on:
       - go300_db
+
+  go300_broker:
+    image: rabbitmq:alpine
+    ports:
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=pass
+
+  go300_worker:
+      build: ./
+      command: celery -A core worker --beat --loglevel=INFO
+      volumes:
+        - ./src:/src:rw
+        - ./.env:/src/core/.env
+      depends_on:
+        - go300_broker
+        - go300_db

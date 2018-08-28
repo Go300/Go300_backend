@@ -1,4 +1,4 @@
-from app.models import Member, Subscription
+from proj.models import Member, Subscription
 
 
 def test_member_create(db):

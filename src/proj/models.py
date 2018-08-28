@@ -12,7 +12,7 @@ class Member(models.Model):
 
 
 class Subscription(models.Model):
-    member = models.ForeignKey(to='app.Member', null=False, on_delete=models.CASCADE, related_name='subscriptions')
+    member = models.ForeignKey(to='proj.Member', null=False, on_delete=models.CASCADE, related_name='subscriptions')
     departure = models.CharField(max_length=128, blank=False)
     destination = models.CharField(max_length=128, blank=False)
     when = models.CharField(max_length=16, blank=False)

@@ -8,14 +8,14 @@ services:
     ports:
       - 5432:5432
 
-  go300_db_admin:
-    image: fenglc/pgadmin4
-    volumes:
-       - /data/pgadmin:/root/.pgadmin
-    ports:
-      - "5050:5050"
-    depends_on:
-      - go300_db
+#  go300_db_admin:
+#    image: fenglc/pgadmin4
+#    volumes:
+#       - /data/pgadmin:/root/.pgadmin
+#    ports:
+#      - "5050:5050"
+#    depends_on:
+#      - go300_db
 
   go300:
     build: ./

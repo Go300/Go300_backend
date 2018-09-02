@@ -139,12 +139,8 @@ CELERY_BROKER_URL = env('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 
 PUSH_NOTIFICATIONS_SETTINGS = {
-    'FCM_API_KEY': '[your api key]',
-    'GCM_API_KEY': '[your api key]',
-    'APNS_CERTIFICATE': '/path/to/your/certificate.pem',
-    'APNS_TOPIC': 'com.example.push_test',
-    'WNS_PACKAGE_SECURITY_ID': '[your package security id, e.g.',
-    'WNS_SECRET_KEY': '[your app secret key, e.g.]',
-    'WP_PRIVATE_KEY': '/path/to/your/private.pem',
-    'WP_CLAIMS': {'sub': 'mailto: development@example.com'}
+    'FCM_API_KEY': env('FCM_API_KEY'),
+    'GCM_API_KEY': env('GCM_API_KEY'),
+    'APNS_CERTIFICATE': env('APNS_CERTIFICATE'),
+    'USER_MODEL': 'proj.Member'
 }

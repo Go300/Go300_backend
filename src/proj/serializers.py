@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
 
 from .models import Member, Subscription
 
@@ -20,5 +21,5 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         fields = ('id', 'member', 'departure', 'destination', 'when')
 
     def create(self, validated_data):
-        validated_data['member'] = Member.objects.filter(token=validated_data['member']).last()
+        validated_data['member'] = get_object_or_404(Member, token=validated_data['member'])
         return Subscription.objects.create(**validated_data)

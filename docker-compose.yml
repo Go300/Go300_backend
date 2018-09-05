@@ -8,14 +8,14 @@ services:
     ports:
       - 5432:5432
 
-#  go300_db_admin:
-#    image: fenglc/pgadmin4
-#    volumes:
-#       - /data/pgadmin:/root/.pgadmin
-#    ports:
-#      - "5050:5050"
-#    depends_on:
-#      - go300_db
+  go300_db_admin:
+    image: fenglc/pgadmin4
+    volumes:
+       - /data/pgadmin:/root/.pgadmin
+    ports:
+      - "5050:5050"
+    depends_on:
+      - go300_db
 
   go300:
     build: ./
@@ -28,20 +28,20 @@ services:
     depends_on:
       - go300_db
 
-#  go300_broker:
-#    image: rabbitmq:alpine
-#    ports:
-#      - 15672:15672
-#    environment:
-#      - RABBITMQ_DEFAULT_USER=user
-#      - RABBITMQ_DEFAULT_PASS=pass
-#
-#  go300_worker:
-#      build: ./
-#      command: celery -A core worker --beat --loglevel=DEBUG
-#      volumes:
-#        - ./src:/src:rw
-#        - ./.env:/src/core/.env
-#      depends_on:
-#        - go300_broker
-#        - go300_db
+  go300_broker:
+    image: rabbitmq:alpine
+    ports:
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=pass
+
+  go300_worker:
+      build: ./
+      command: celery -A core worker --beat --loglevel=DEBUG
+      volumes:
+        - ./src:/src:rw
+        - ./.env:/src/core/.env
+      depends_on:
+        - go300_broker
+        - go300_db

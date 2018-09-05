@@ -1,7 +1,20 @@
+from push_notifications.models import GCMDevice
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
 from .models import Member, Subscription
+
+
+class DeviceSerializer(serializers.ModelSerializer):
+    user = serializers.UUIDField(required=True, write_only=True)
+
+    class Meta:
+        model = GCMDevice
+        fields = ('registration_id', 'cloud_message_type', 'user')
+
+    def create(self, validated_data):
+        validated_data['user'] = get_object_or_404(Member, token=validated_data['user'])
+        return GCMDevice.objects.create(**validated_data)
 
 
 class MemberSerializer(serializers.ModelSerializer):

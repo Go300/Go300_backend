@@ -1,7 +1,8 @@
+from push_notifications.models import GCMDevice
 from rest_framework.viewsets import ModelViewSet
 
 from .models import Member, Subscription
-from .serializers import MemberSerializer, SubscriptionSerializer
+from .serializers import MemberSerializer, SubscriptionSerializer, DeviceSerializer
 
 
 class MemberViewSet(ModelViewSet):
@@ -18,3 +19,11 @@ class SubscriptionViewSet(ModelViewSet):
 
     serializer_class = SubscriptionSerializer
     queryset = Subscription.objects.all()
+
+
+class DeviceViewSet(ModelViewSet):
+    class Meta:
+        model = GCMDevice
+
+    serializer_class = DeviceSerializer
+    queryset = GCMDevice.objects.all()

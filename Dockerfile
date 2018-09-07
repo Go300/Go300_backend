@@ -11,5 +11,3 @@ WORKDIR /src
 RUN cp /usr/share/zoneinfo/Asia/Almaty /etc/localtime
 RUN echo "Asia/Almaty" > /etc/timezone
 RUN pip install -U -r requirements.txt
-
-CMD bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"

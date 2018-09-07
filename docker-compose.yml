@@ -5,8 +5,8 @@ services:
     image: postgres:alpine
     volumes:
       - ./data:/var/lib/postgresql/data:rw
-    ports:
-      - 5432:5432
+#    ports:
+#      - 5432:5432
 
 #  go300_db_admin:
 #    image: fenglc/pgadmin4
@@ -23,8 +23,8 @@ services:
     volumes:
       - ./src:/src:rw
       - ./.env:/src/core/.env
-    ports:
-      - 8000:8000
+#    ports:
+#      - 8000:8000
     depends_on:
       - go300_db
 

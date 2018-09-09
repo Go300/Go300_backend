@@ -24,5 +24,4 @@ jobs:
     - stage: build
       script: docker-compose up -d
     - stage: test
-      script: docker-compose up -d && docker-compose exec go300 bash -c "pytest -v --cov . --cov-report term-missing --cov-fail-under=100 --flake8"
-
+      script: docker-compose up -d && sleep 5s && docker-compose exec go300 bash -c "pytest -v --cov . --cov-report term-missing --cov-fail-under=100 --flake8"

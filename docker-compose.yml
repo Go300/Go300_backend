@@ -1,12 +1,35 @@
 version: '3'
 
 services:
+
+  go300:
+    build: ./
+    command: ./entrypoint.sh
+    volumes:
+      - ./entrypoint.sh:/src/entrypoint.sh:rw
+      - ./src:/src:rw
+      - ./.env:/src/core/.env
+    ports:
+      - 8000:8000
+    depends_on:
+      - go300_db
+
+#  go300_worker:
+#      build: ./
+#      command: celery -A core worker --beat --loglevel=INFO
+#      volumes:
+#        - ./src:/src:rw
+#        - ./.env:/src/core/.env
+#      depends_on:
+#        - go300_broker
+#        - go300_db
+
   go300_db:
     image: postgres:alpine
     volumes:
       - ./data:/var/lib/postgresql/data:rw
-#    ports:
-#      - 5432:5432
+    ports:
+      - 5432:5432
 
 #  go300_db_admin:
 #    image: fenglc/pgadmin4
@@ -17,17 +40,6 @@ services:
 #    depends_on:
 #      - go300_db
 
-  go300:
-    build: ./
-    command: bash -c "python manage.py migrate && python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - ./src:/src:rw
-      - ./.env:/src/core/.env
-#    ports:
-#      - 8000:8000
-    depends_on:
-      - go300_db
-
 #  go300_broker:
 #    image: rabbitmq:alpine
 #    ports:
@@ -35,13 +47,3 @@ services:
 #    environment:
 #      - RABBITMQ_DEFAULT_USER=user
 #      - RABBITMQ_DEFAULT_PASS=pass
-#
-#  go300_worker:
-#      build: ./
-#      command: celery -A core worker --beat --loglevel=DEBUG
-#      volumes:
-#        - ./src:/src:rw
-#        - ./.env:/src/core/.env
-#      depends_on:
-#        - go300_broker
-#        - go300_db

@@ -16,3 +16,9 @@ class Subscription(models.Model):
     departure = models.CharField(max_length=128, blank=False)
     destination = models.CharField(max_length=128, blank=False)
     when = models.CharField(max_length=16, blank=False)
+
+
+class Confirmation(models.Model):
+    member = models.ForeignKey(to='proj.Member', on_delete=models.CASCADE, related_name='confirmations', null=False)
+    confirmed = models.BooleanField(default=False)
+    when = models.CharField(max_length=16, blank=False)

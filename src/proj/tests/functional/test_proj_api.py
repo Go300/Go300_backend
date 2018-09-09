@@ -1,6 +1,6 @@
 from push_notifications.models import GCMDevice
 
-from proj.models import Member, Subscription
+from proj.models import Member, Subscription, Confirmation
 from rest_framework.test import APIClient
 
 
@@ -54,3 +54,29 @@ def test_create_subscription(db):
     assert response.data['when'] == Subscription.objects.last().when
     assert response.data['departure'] == Subscription.objects.last().departure
     assert response.data['destination'] == Subscription.objects.last().destination
+
+
+def test_patch_confirmation(db):
+    member = Member.objects.create(username='MuslimBeibytuly')
+    data = {
+        'member': member.token,
+        'when': '10:30',
+        'departure': 'KBTU',
+        'destination': 'DMIS'
+    }
+    response = APIClient().post('/api/subscriptions/', data)
+    assert response.status_code == 201
+    assert response.data['when'] == '10:30'
+    assert response.data['departure'] == 'KBTU'
+    assert response.data['destination'] == 'DMIS'
+    assert response.data['when'] == Subscription.objects.last().when
+    assert response.data['departure'] == Subscription.objects.last().departure
+    assert response.data['destination'] == Subscription.objects.last().destination
+
+    confirmation = Confirmation.objects.create(
+        member=Subscription.objects.last().member,
+        when=Subscription.objects.last().when
+    )
+    response = APIClient().patch('/api/confirmations/{}/'.format(confirmation.id), {})
+    assert response.status_code == 200
+    assert Confirmation.objects.last().confirmed is True

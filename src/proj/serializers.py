@@ -2,7 +2,7 @@ from push_notifications.models import GCMDevice
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
-from .models import Member, Subscription
+from .models import Member, Subscription, Confirmation
 
 
 class DeviceSerializer(serializers.ModelSerializer):
@@ -36,3 +36,14 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['member'] = get_object_or_404(Member, token=validated_data['member'])
         return Subscription.objects.create(**validated_data)
+
+
+class ConfirmationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Confirmation
+        fields = ('id', 'when')
+
+    def update(self, instance, validated_data):
+        instance.confirmed = True
+        instance.save()
+        return instance

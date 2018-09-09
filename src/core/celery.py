@@ -27,18 +27,6 @@ def notify_users(hour, minute):
         )
 
 
-@app.task
-def group_users(hour, minute):
-    from proj.models import Subscription
-    when = '{0}:{1}'.format(str(hour), str(minute))
-    subscriptions = Subscription.objects.filter(when=when).all()
-    for subscription in subscriptions:
-        subscription.member.device_set.last().send_message(
-            'Через полчаса у вас состоится поездка! '
-            'Подтвердите что вы готовы и выходите к выходу'
-        )
-
-
 tasks = {}
 
 for hour in range(0, 24):

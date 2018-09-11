@@ -14,17 +14,55 @@ app.autodiscover_tasks()
 
 
 @app.task
-def notify_users(hour, minute):
+def notify_members(hour, minute):
     from proj.models import Subscription, Confirmation
     when = '{0}:{1}'.format(str(hour), str(minute))
-    subscriptions = Subscription.objects.filter(when=when).all()
+    subscriptions = list(Subscription.objects.filter(when=when).all())
     for subscription in subscriptions:
         confirmation = Confirmation.objects.create(member=subscription.member, when=when)
-        subscription.member.device_set.last().send_message(
+        subscription.member.gcmdevice_set.last().send_message(
             'Через полчаса у вас состоится поездка! '
             'Подтвердите что вы готовы и выходите к выходу!'
             'Ваш id: {}'.format(confirmation.id)
         )
+
+
+@app.task
+def group_members(hour, minute):
+    from proj.models import Confirmation, Group
+    when = '{0}:{1}'.format(str(hour), str(minute))
+    confirmations = list(Confirmation.objects.filter(when=when).filter(confirmed=True).all())
+    while len(confirmations) >= 7:
+        group = Group.objects.create()
+        for _ in range(4):
+            confirmation = confirmations.pop()
+            group.members.add(confirmation.member)
+            group.save()
+    if len(confirmations) == 6:
+        group = Group.objects.create()
+        for _ in range(3):
+            confirmation = confirmations.pop()
+            group.members.add(confirmation.member)
+            group.save()
+    if len(confirmations) == 5:
+        group = Group.objects.create()
+        for _ in range(3):
+            confirmation = confirmations.pop()
+            group.members.add(confirmation.member)
+            group.save()
+        group = Group.objects.create()
+        for _ in range(2):
+            confirmation = confirmations.pop()
+            group.members.add(confirmation.member)
+            group.save()
+    if 4 >= len(confirmations) >= 1:
+        group = Group.objects.create()
+        while len(confirmations) > 0:
+            confirmation = confirmations.pop()
+            group.members.add(confirmation.member)
+            group.save()
+
+    Confirmation.objects.all().delete()
 
 
 tasks = {}
@@ -32,9 +70,15 @@ tasks = {}
 for hour in range(0, 24):
     for minute in (0, 30):
         tasks['notify users_{0}_{1}'.format(hour, minute)] = {
-            'task': 'core.celery.notify_users',
+            'task': 'core.celery.notify_members',
             'schedule': crontab(hour=str(hour), minute=str(minute)),
             'args': ((hour + (minute + 30) // 60) % 24, (minute + 30) % 60)
+        }
+    for minute in (20, 50):
+        tasks['notify users_{0}_{1}'.format(hour, minute)] = {
+            'task': 'core.celery.group_members',
+            'schedule': crontab(hour=str(hour), minute=str(minute)),
+            'args': ((hour + (minute + 10) // 60) % 24, (minute + 10) % 60)
         }
 
 app.conf.beat_schedule = tasks

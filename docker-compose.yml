@@ -6,7 +6,6 @@ services:
     build: ./
     command: ./entrypoint.sh
     volumes:
-      - ./entrypoint.sh:/src/entrypoint.sh:rw
       - ./src:/src:rw
       - ./.env:/src/core/.env
     ports:

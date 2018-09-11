@@ -35,51 +35,47 @@ def group_members(hour, minute):
     groups = []
     while len(confirmations) >= 7:
         group = Group.objects.create()
-        groups.append(group)
         for _ in range(4):
             confirmation = confirmations.pop()
             group.members.add(confirmation.member)
             group.save()
+            groups.append(group)
     if len(confirmations) == 6:
         group = Group.objects.create()
-        groups.append(group)
         for _ in range(3):
             confirmation = confirmations.pop()
             group.members.add(confirmation.member)
             group.save()
+            groups.append(group)
     if len(confirmations) == 5:
         group = Group.objects.create()
-        groups.append(group)
         for _ in range(3):
             confirmation = confirmations.pop()
             group.members.add(confirmation.member)
             group.save()
+            groups.append(group)
         group = Group.objects.create()
-        groups.append(group)
         for _ in range(2):
             confirmation = confirmations.pop()
             group.members.add(confirmation.member)
             group.save()
+            groups.append(group)
     if 4 >= len(confirmations) >= 1:
         group = Group.objects.create()
-        groups.append(group)
         while len(confirmations) > 0:
             confirmation = confirmations.pop()
             group.members.add(confirmation.member)
             group.save()
-
-    Confirmation.objects.all().delete()
-
+            groups.append(group)
     for group in groups:
-        names = ''
-        for member in group.members:
-            names += member.username + ' '
-        for member in group.members:
+        names = ''.join(member.username for member in group.members.all())
+        for member in group.members.all():
             member.gcmdevice_set.last().send_message(
                 'Через 10 минут у вас состоится поездка!\n'
                 'выходите к выходу на Толе би!\n'
                 'Id вашей группы: {0}, в этой группе: {1}\n'.format(group.id, names)
             )
+    Confirmation.objects.all().delete()
 
 
 tasks = {}

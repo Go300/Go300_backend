@@ -24,6 +24,10 @@ class Subscription(models.Model):
 
 
 class Confirmation(models.Model):
-    member = models.ForeignKey(to='proj.Member', on_delete=models.CASCADE, related_name='confirmations', null=False)
+    subscription = models.ForeignKey(
+        to='proj.Subscription',
+        on_delete=models.CASCADE,
+        related_name='confirmations',
+        null=False
+    )
     confirmed = models.BooleanField(default=False)
-    when = models.CharField(max_length=16, blank=False)

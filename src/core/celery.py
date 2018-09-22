@@ -19,7 +19,7 @@ def notify_members(hour, minute):
     when = '{0}:{1}'.format(str(hour), str(minute))
     subscriptions = list(Subscription.objects.filter(when=when).all())
     for subscription in subscriptions:
-        confirmation = Confirmation.objects.create(member=subscription.member, when=when)
+        confirmation = Confirmation.objects.create(subscription=subscription)
         subscription.member.gcmdevice_set.last().send_message(
             'Через полчаса у вас состоится поездка!\n'
             'Подтвердите что вы готовы!\n'
@@ -31,50 +31,62 @@ def notify_members(hour, minute):
 def group_members(hour, minute):
     from proj.models import Confirmation, Group
     when = '{0}:{1}'.format(str(hour), str(minute))
-    confirmations = list(Confirmation.objects.filter(when=when).filter(confirmed=True).all())
-    groups = []
-    while len(confirmations) >= 7:
-        group = Group.objects.create()
-        for _ in range(4):
-            confirmation = confirmations.pop()
-            group.members.add(confirmation.member)
-            group.save()
-            groups.append(group)
-    if len(confirmations) == 6:
-        group = Group.objects.create()
-        for _ in range(3):
-            confirmation = confirmations.pop()
-            group.members.add(confirmation.member)
-            group.save()
-            groups.append(group)
-    if len(confirmations) == 5:
-        group = Group.objects.create()
-        for _ in range(3):
-            confirmation = confirmations.pop()
-            group.members.add(confirmation.member)
-            group.save()
-            groups.append(group)
-        group = Group.objects.create()
-        for _ in range(2):
-            confirmation = confirmations.pop()
-            group.members.add(confirmation.member)
-            group.save()
-            groups.append(group)
-    if 4 >= len(confirmations) >= 1:
-        group = Group.objects.create()
-        while len(confirmations) > 0:
-            confirmation = confirmations.pop()
-            group.members.add(confirmation.member)
-            group.save()
-            groups.append(group)
-    for group in groups:
-        names = ''.join(member.username for member in group.members.all())
-        for member in group.members.all():
-            member.gcmdevice_set.last().send_message(
-                'Через 10 минут у вас состоится поездка!\n'
-                'выходите к выходу на Толе би!\n'
-                'Id вашей группы: {0}, в этой группе: {1}\n'.format(group.id, names)
+    for departure in ['KBTU', 'DMIS', 'FP']:
+        for destination in ['KBTU', 'DMIS', 'FP']:
+            confirmations = list(
+                Confirmation.objects.filter(
+                    confirmed=True
+                ).filter(
+                    subscription__when=when
+                ).filter(
+                    subscription__departure=departure
+                ).filter(
+                    subscription__destination=destination
+                ).all()
             )
+            groups = []
+            while len(confirmations) >= 7:
+                group = Group.objects.create()
+                for _ in range(4):
+                    confirmation = confirmations.pop()
+                    group.members.add(confirmation.subscription.member)
+                    group.save()
+                    groups.append(group)
+            if len(confirmations) == 6:
+                group = Group.objects.create()
+                for _ in range(3):
+                    confirmation = confirmations.pop()
+                    group.members.add(confirmation.subscription.member)
+                    group.save()
+                    groups.append(group)
+            if len(confirmations) == 5:
+                group = Group.objects.create()
+                for _ in range(3):
+                    confirmation = confirmations.pop()
+                    group.members.add(confirmation.subscription.member)
+                    group.save()
+                    groups.append(group)
+                group = Group.objects.create()
+                for _ in range(2):
+                    confirmation = confirmations.pop()
+                    group.members.add(confirmation.subscription.member)
+                    group.save()
+                    groups.append(group)
+            if 4 >= len(confirmations) >= 1:
+                group = Group.objects.create()
+                while len(confirmations) > 0:
+                    confirmation = confirmations.pop()
+                    group.members.add(confirmation.subscription.member)
+                    group.save()
+                    groups.append(group)
+            for group in groups:
+                names = ''.join(member.username for member in group.members.all())
+                for member in group.members.all():
+                    member.gcmdevice_set.last().send_message(
+                        'Через 10 минут у вас состоится поездка!\n'
+                        'выходите к выходу на Толе би!\n'
+                        'Id вашей группы: {0}, в этой группе: {1}\n'.format(group.id, names)
+                    )
     Confirmation.objects.all().delete()
 
 

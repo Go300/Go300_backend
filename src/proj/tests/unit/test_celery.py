@@ -19,12 +19,12 @@ def test_notify_members(db):
     )
     assert response.status_code == 201
     assert GCMDevice.objects.count() == 1
-    Subscription.objects.create(member=member, when='10:30', departure='DMIS', destination='KBTU')
+    subscription = Subscription.objects.create(member=member, when='10:30', departure='DMIS', destination='KBTU')
 
     notify_members.apply(kwargs={'hour': 10, 'minute': 30})
 
     assert Confirmation.objects.count() == 1
-    assert Confirmation.objects.last().member == member
+    assert Confirmation.objects.last().subscription == subscription
 
 
 def test_group_members(db):
@@ -41,11 +41,11 @@ def test_group_members(db):
     )
     assert response.status_code == 201
     assert GCMDevice.objects.count() == 1
-    Subscription.objects.create(member=member, when='10:30', departure='DMIS', destination='KBTU')
+    subscription = Subscription.objects.create(member=member, when='10:30', departure='DMIS', destination='KBTU')
 
     notify_members.apply(kwargs={'hour': 10, 'minute': 30})
     assert Confirmation.objects.count() == 1
-    assert Confirmation.objects.last().member == member
+    assert Confirmation.objects.last().subscription == subscription
 
     assert Confirmation.objects.last().confirmed is False
     response = APIClient().patch('/api/confirmations/{}/'.format(Confirmation.objects.last().id), {})

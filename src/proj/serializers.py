@@ -41,7 +41,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 class ConfirmationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Confirmation
-        fields = ('id', 'when')
+        fields = ('id',)
 
     def update(self, instance, validated_data):
         instance.confirmed = True

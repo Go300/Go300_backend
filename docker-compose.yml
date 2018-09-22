@@ -27,8 +27,8 @@ services:
     image: postgres:alpine
     volumes:
       - ./data:/var/lib/postgresql/data:rw
-#    ports:
-#      - 5432:5432
+    ports:
+      - 5432:5432
 
 #  go300_db_admin:
 #    image: fenglc/pgadmin4

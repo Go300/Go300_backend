@@ -74,8 +74,7 @@ def test_patch_confirmation(db):
     assert response.data['destination'] == Subscription.objects.last().destination
 
     confirmation = Confirmation.objects.create(
-        member=Subscription.objects.last().member,
-        when=Subscription.objects.last().when
+        subscription=Subscription.objects.last()
     )
     response = APIClient().patch('/api/confirmations/{}/'.format(confirmation.id), {})
     assert response.status_code == 200

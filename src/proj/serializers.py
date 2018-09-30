@@ -20,10 +20,23 @@ class DeviceSerializer(serializers.ModelSerializer):
 class MemberSerializer(serializers.ModelSerializer):
     token = serializers.ReadOnlyField()
     username = serializers.CharField(required=True)
+    registration_id = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = Member
-        fields = ('username', 'token')
+        fields = ('username', 'token', 'registration_id')
+        extra_kwargs = {
+            'registration_id': {'write_only': True}
+        }
+
+    def validate(self, attrs):
+        self.registration_id = attrs.pop('registration_id', None)
+        return attrs
+
+    def create(self, validated_data):
+        member = Member.objects.create(**validated_data)
+        GCMDevice.objects.create(user=member, registration_id=self.registration_id)
+        return member
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):

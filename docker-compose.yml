@@ -28,12 +28,12 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data:rw
 
-  go300_db_admin:
-    image: fenglc/pgadmin4
-    ports:
-      - 5050:5050
-    depends_on:
-      - go300_db
+#  go300_db_admin:
+#    image: fenglc/pgadmin4
+#    ports:
+#      - 5050:5050
+#    depends_on:
+#      - go300_db
 
   go300_broker:
     image: rabbitmq:alpine

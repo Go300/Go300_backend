@@ -4,7 +4,7 @@ cached-property==1.4.3
 celery==4.2.1
 certifi==2018.8.24
 chardet==3.0.4
-Django==2.1
+Django==2.2.24
 django-environ==0.4.5
 django-extensions==2.1.0
 django-filter==2.0.0
